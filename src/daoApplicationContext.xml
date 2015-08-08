@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xmlns="http://www.springframework.org/schema/beans"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans 
+   http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+   http://www.springframework.org/schema/context
+   http://www.springframework.org/schema/context/spring-context-3.0.xsd 
+   http://www.springframework.org/schema/aop
+   http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+   http://www.springframework.org/schema/tx
+   http://www.springframework.org/schema/tx/spring-tx-3.0.xsd" >
+
+    <!-- 配置数据池 -->
+
+    <bean
+        id="myDataSource"
+        class="org.apache.commons.dbcp.BasicDataSource"
+        destroy-method="close" >
+        
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+		
+		 <!-- Local -->
+		<property name="url" value="jdbc:mysql://localhost:3306/onemenudb?useUnicode=true&amp;characterEncoding=utf8" />
+		<property name="username" value="root" />
+		<property name="password" value="root" />
+        <property  name="defaultAutoCommit"   value="false" />
+
+         <property name="minEvictableIdleTimeMillis"  value="60000"/>
+		 <property name="timeBetweenEvictionRunsMillis" value="10000"/>
+		 
+    </bean>
+
+    <bean
+        id="mySessionFactory"
+        class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean" >
+
+        <property
+            name="dataSource"
+            ref="myDataSource" />
+
+        <property
+            name="packagesToScan"
+            value="com.onemenu.server.model" />
+
+
+        <property name="hibernateProperties" >
+
+            <props>
+                <!-- MySQL的方言 -->
+				<prop key="hibernate.dialect">
+					org.hibernate.dialect.MySQLDialect
+				</prop>
+			
+				<prop key="hibernate.show_sql">
+					false
+				</prop>
+			
+				<prop key="hibernate.format_sql">
+					true
+				</prop>
+			
+				<prop key="hibernate.hbm2ddl.auto">
+					update
+				</prop>
+				
+				<prop key="hibernate.connection.release_mode">after_transaction</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean
+        id="myHibernateTemplate"
+        class="org.springframework.orm.hibernate3.HibernateTemplate" >
+
+        <property
+            name="sessionFactory"
+            ref="mySessionFactory" >
+        </property>
+    </bean>
+    <!-- dao -->
+    <bean id="accountDAO" class="com.onemenu.server.daoImpl.AccountDAOImpl" />
+    <bean id="baseDao" name="mbaseDAO" class="com.onemenu.server.daoImpl.BaseDAOSupport" />
+    <bean id="couponDao" class="com.onemenu.server.daoImpl.CouponDAOImpl" />
+    <bean id="customerDao" class="com.onemenu.server.daoImpl.CustomerDAOImpl" />
+    <bean id="dishCategoryDao" class="com.onemenu.server.daoImpl.DishCategoryDAOImpl" />
+    <bean id="dishDao" class="com.onemenu.server.daoImpl.DishDAOImpl" />
+    <bean id="dishRankDao" class="com.onemenu.server.daoImpl.DishRankDAOImpl" />
+    <bean id="RestaurantRankDao" class="com.onemenu.server.daoImpl.RestaurantRankDAOImpl" />
+    <bean id="RestaurantDao" class="com.onemenu.server.daoImpl.RestaurantDAOImpl" />
+    <bean id="ReviewDao" class="com.onemenu.server.daoImpl.ReviewDAOImpl" />
+    <bean id="TagRankDao" class="com.onemenu.server.daoImpl.TagRankDAOImpl" />
+    <bean id="ThirdPartyAccountDAO" class="com.onemenu.server.daoImpl.ThirdPartyAccountDAOImpl" />
+    <bean id="TradeDAO" class="com.onemenu.server.daoImpl.TradeDAOImpl" />
+    <bean id="orderFormDao" class="com.onemenu.server.daoImpl.OrderFormDAOImpl" />
+	
+</beans>

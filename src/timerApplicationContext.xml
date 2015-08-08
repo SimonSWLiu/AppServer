@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xmlns="http://www.springframework.org/schema/beans"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans 
+   http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+   http://www.springframework.org/schema/context
+   http://www.springframework.org/schema/context/spring-context-3.0.xsd 
+   http://www.springframework.org/schema/aop
+   http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+   http://www.springframework.org/schema/tx
+   http://www.springframework.org/schema/tx/spring-tx-3.0.xsd" >
+	<!-- 定时器设置开始 -->
+	<!-- 第一步 声明一个定时任务,该类extends java.util.TimerTask -->
+	<bean id="receiveTask" class="com.onemenu.server.timer.MonitorTimer"></bean>
+
+	<!-- 第二步 调度定时任务,把声明的定时任务注入进来,并设置定时参数 -->
+	<bean id="scheduledClock" class="org.springframework.scheduling.timer.ScheduledTimerTask">
+		<property name="timerTask" ref="receiveTask" />
+		<property name="period">
+			<value>900000</value>
+			<!--这里是每隔多长时间就进行一次计时任务,单位ms -->
+		</property>
+		<property name="delay">
+			<value>30000</value>
+			<!--这里是服务启动后延时多少时间,开始计时任务,单位ms -->
+		</property>
+	</bean>
+	
+	<bean id="monitorOptionTimer" class="com.onemenu.server.timer.MonitorOptionTimer"></bean>
+
+	<bean id="scheduledClock2" class="org.springframework.scheduling.timer.ScheduledTimerTask">
+		<property name="timerTask" ref="monitorOptionTimer" />
+		<property name="period">
+			<value>1800000</value>
+			<!--这里是每隔多长时间就进行一次计时任务,单位ms -->
+		</property>
+		<property name="delay">
+			<value>60000</value>
+			<!--这里是服务启动后延时多少时间,开始计时任务,单位ms -->
+		</property>
+	</bean>
+	
+	<!-- 启动凌晨12点执行的定时任务 -->
+	<bean id="resetValueJob" class="org.springframework.scheduling.quartz.JobDetailBean">
+		<property name="jobClass">
+			<value>com.onemenu.server.timer.ResetValueJob</value>
+		</property>
+	</bean> 
+	
+	<!-- 设定凌晨12点执行 -->
+	<bean id="cronReportTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="resetValueJob" />
+		<property name="cronExpression">
+			<value>0 0 0 * * ?</value>
+		</property>
+	</bean>
+
+	<!-- 启动定时任务,如果有多个定时任务,则重复步骤一,二,然后把第二步设置的beany放在下面的list列表中.此方法不能精确几点运行定时任务 -->
+	<bean id="startTimeTask" class="org.springframework.scheduling.timer.TimerFactoryBean">
+		<property name="scheduledTimerTasks">
+			<list>
+				<ref bean="scheduledClock"></ref>
+				<ref bean="scheduledClock2"></ref>
+			</list>
+		</property>
+	</bean>   
+	
+	<!-- 启动精确到几点的定时器 -->
+	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+        <property name="triggers">
+           <list><ref bean="cronReportTrigger"/></list>
+        </property>
+    </bean> 
+	<!-- 定时器设置结束 -->
+</beans>

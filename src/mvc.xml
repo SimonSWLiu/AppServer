@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xmlns:mvc="http://www.springframework.org/schema/mvc"
+    xmlns="http://www.springframework.org/schema/beans"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans 
+  http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+   http://www.springframework.org/schema/context
+   http://www.springframework.org/schema/context/spring-context-3.0.xsd 
+   http://www.springframework.org/schema/aop
+   http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+   http://www.springframework.org/schema/tx
+   http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+   http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd" >
+
+    <!-- <import resource="applicationContext.xml" /> -->
+
+    <context:component-scan base-package="com.onemenu.server.controller" >
+    </context:component-scan>
+
+    <mvc:annotation-driven />
+
+    <aop:aspectj-autoproxy proxy-target-class="true" />
+
+    <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter" >
+
+        <property name="messageConverters" >
+
+            <list>
+
+                <bean class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter" >
+                	<!-- 为了处理返回的JSON数据的编码，默认是ISO-88859-1的，这里把它设置为UTF-8,解决有乱码的情况 --> 
+                	<!-- <property name="supportedMediaTypes">    
+			            <list>    
+			                  <value>text/html;charset=UTF-8</value>    
+			            </list>    
+			        </property> -->
+                </bean>
+
+                <bean class="org.springframework.http.converter.StringHttpMessageConverter" >
+                </bean>
+                
+            </list>
+        </property>
+    </bean>
+
+	<bean
+		class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
+		<property name="viewResolvers">
+			<list>
+				<!-- <bean class="org.springframework.web.servlet.view.BeanNameViewResolver" 
+					/> -->
+				<bean
+					class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+					<property name="prefix" value="/WEB-INF/view/" />
+					<property name="suffix" value=".jsp" />
+				</bean>
+			</list>
+		</property>
+	</bean>
+    
+    <mvc:interceptors>
+    
+    	<!-- 如果 mvc:mapping 不配置或/*,将拦截所有的Controller -->
+    	<!-- <mvc:interceptor>
+	    	<mvc:mapping path="/*"/>	
+	    	<bean class="com.onemenu.server.filter.PermissionInterceptor"/>
+    	</mvc:interceptor> -->
+    	
+    	<bean id="permissionInterceptor" class="com.onemenu.server.filter.PermissionInterceptor"/>
+	</mvc:interceptors>
+	
+	<!-- 国际化配置 -->
+	<mvc:interceptors>
+	<bean id="localeChangeInterceptor" class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor" >
+		 <property name="paramName" value="siteLanguage"/>
+	</bean>
+	</mvc:interceptors>
+	<bean id="localeResolver" class="org.springframework.web.servlet.i18n.SessionLocaleResolver">
+		<property name="defaultLocale" value="en_US"></property>
+	</bean>
+	<bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+		<property name="basename" value="/WEB-INF/messages/messages" />
+		<property name="cacheSeconds" value="5" />
+	</bean>    
+
+</beans>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns="http://www.springframework.org/schema/beans"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+   http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+   http://www.springframework.org/schema/context
+   http://www.springframework.org/schema/context/spring-context-3.0.xsd 
+   http://www.springframework.org/schema/aop
+   http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+   http://www.springframework.org/schema/tx
+   http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
+
+	<tx:annotation-driven transaction-manager="myTxManager" />
+
+	<!-- 配置事务 -->
+	<bean id="myTxManager" name="transactionManager"
+		class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		<property name="sessionFactory" ref="mySessionFactory">
+		</property>
+	</bean>
+	<!-- <aop:config> <aop:pointcut id="productServiceMethods" expression="execution(* 
+		com.jiubang.crashemail.serviceImpl.*.*(..))" /> <aop:advisor advice-ref="txAdvice" 
+		pointcut-ref="productServiceMethods" /> </aop:config> <tx:advice id="txAdvice" 
+		transaction-manager="myTxManager"> <tx:attributes> <tx:method name="*Trd" 
+		propagation="REQUIRED" /> </tx:attributes> </tx:advice> -->
+
+	<bean id="exceptionResolver"
+		class="com.onemenu.server.exceptionResolver.ControllerExceptionHandler">
+		<!-- 
+		<property name="defaultErrorView">
+			<value>failure</value>
+		</property>
+		<property name="warnLogCategory" value="ERROR"></property>
+		 -->
+	</bean>
+	
+	<!-- 配置MultipartResolver 用于文件上传 使用spring的CommosMultipartResolver -->
+	<bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="defaultEncoding" value="utf-8" />
+		<property name="maxUploadSize" value="5400000" />
+		<property name="maxInMemorySize" value="40960" />
+	</bean>
+	
+	<!-- service -->
+	<bean id="accountService" class="com.onemenu.server.serviceImpl.AccountServiceImpl" />
+	<bean id="couponService" class="com.onemenu.server.serviceImpl.CouponServiceImpl" />
+	<bean id="customerFeedbackService" class="com.onemenu.server.serviceImpl.CustomerFeedbackServiceImpl" />
+	<bean id="customerService" class="com.onemenu.server.serviceImpl.CustomerServiceImpl" />
+	<bean id="dishCategoryService" class="com.onemenu.server.serviceImpl.DishCategoryServiceImpl" />
+	<bean id="dishService" class="com.onemenu.server.serviceImpl.DishServiceImpl" />
+	<bean id="orderFormService" class="com.onemenu.server.serviceImpl.OrderFormServiceImpl" />
+	<bean id="orderItemService" class="com.onemenu.server.serviceImpl.OrderItemServiceImpl" />
+	<bean id="restaurantService" class="com.onemenu.server.serviceImpl.RestaurantServiceImpl" />
+	<bean id="reviewItemService" class="com.onemenu.server.serviceImpl.ReviewItemServiceImpl" />
+	<bean id="reviewService" class="com.onemenu.server.serviceImpl.ReviewServiceImpl" />
+	<bean id="tagRankService" class="com.onemenu.server.serviceImpl.TagRankServiceImpl" />
+	<bean id="thirdPartyAccountService" class="com.onemenu.server.serviceImpl.ThirdPartyAccountServiceImpl" />
+	<bean id="tradeService" class="com.onemenu.server.serviceImpl.TradeServiceImpl" />
+</beans>
